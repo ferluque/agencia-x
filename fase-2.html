@@ -67,6 +67,15 @@
 
   .row{display:flex;gap:8px;flex-wrap:wrap;}
 
+  input[type=text]{
+    flex:1;min-width:0;
+    font-family:'JetBrains Mono',monospace;font-size:14px;
+    background:rgba(0,0,0,0.4);border:1px solid var(--grey);color:var(--white);
+    padding:12px 12px;border-radius:2px;min-height:46px;
+    -webkit-appearance:none;appearance:none;
+  }
+  input[type=text]:focus{outline:none;border-color:var(--amber);}
+
   button{
     font-family:'JetBrains Mono',monospace;background:transparent;border:1px solid var(--red);color:var(--white);
     padding:12px 22px;min-height:46px;font-size:12.5px;letter-spacing:0.12em;text-transform:uppercase;
@@ -98,41 +107,49 @@
     75%{transform:translateX(6px);}
   }
 
-  /* punto de encuentro de mares */
-  .sea-readout{font-size:13.5px;color:var(--amber);letter-spacing:0.03em;margin-bottom:10px;text-align:center;min-height:2.4em;}
-  input[type=range]{
-    -webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:4px;
-    background:linear-gradient(to right, var(--sea-a), var(--sea-b));outline:none;margin:14px 0 6px;
+  /* subida de foto */
+  .upload-btn{
+    display:inline-block;font-family:'JetBrains Mono',monospace;background:transparent;border:1px solid var(--red);
+    color:var(--white);padding:12px 22px;min-height:46px;line-height:22px;font-size:12.5px;letter-spacing:0.12em;
+    text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background .2s,color .2s,box-shadow .2s;
   }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;
-    background:var(--white);border:2px solid var(--amber);cursor:pointer;box-shadow:0 0 8px rgba(255,176,32,0.6);
+  .upload-btn:hover{background:var(--red);box-shadow:0 0 20px rgba(255,43,61,0.45);}
+  .photo-preview{margin-top:16px;display:none;}
+  .photo-preview.show{display:block;}
+  .photo-frame{position:relative;max-width:220px;margin:0 auto;border:1px solid rgba(255,43,61,0.4);border-radius:3px;overflow:hidden;}
+  .photo-frame img{width:100%;display:block;filter:grayscale(0.3) contrast(1.05);}
+  .photo-frame .scan{
+    position:absolute;left:0;right:0;height:2px;background:var(--red);box-shadow:0 0 8px var(--red);
+    animation:scanmove 1.4s linear infinite;
   }
-  input[type=range]::-moz-range-thumb{
-    width:24px;height:24px;border-radius:50%;background:var(--white);border:2px solid var(--amber);cursor:pointer;
-  }
-  .scale-labels{display:flex;justify-content:space-between;font-size:10.5px;color:var(--grey);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px;}
-  .scale-labels span:first-child{color:var(--sea-a);}
-  .scale-labels span:last-child{color:var(--sea-b);}
+  @keyframes scanmove{0%{top:0;}100%{top:100%;}}
+  .photo-frame.done .scan{display:none;}
 
-  /* sonar */
-  .sonar{width:140px;height:140px;margin:6px auto 14px;position:relative;cursor:pointer;}
+  /* sonar — seguimiento sostenido */
+  .sonar-wrap{position:relative;width:200px;height:200px;margin:6px auto 4px;}
+  .sonar-progress{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);pointer-events:none;}
+  .progress-bg{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:4;}
+  .progress-fg{
+    fill:none;stroke:var(--amber);stroke-width:4;stroke-linecap:round;
+    stroke-dasharray:578;stroke-dashoffset:578;
+  }
+  .sonar{position:absolute;inset:14px;border-radius:50%;touch-action:none;cursor:pointer;background:rgba(255,43,61,0.03);}
   .sonar .ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,43,61,0.35);}
-  .sonar .ring.r2{inset:18px;}
-  .sonar .ring.r3{inset:36px;}
-  .sonar .sweep{position:absolute;inset:0;border-radius:50%;overflow:hidden;animation:sweep 3.2s linear infinite;}
-  .sonar .sweep::before{
-    content:'';position:absolute;top:0;left:50%;width:50%;height:50%;
-    background:conic-gradient(from 0deg, rgba(255,43,61,0.35), transparent 60%);
-    transform-origin:0% 100%;
+  .sonar .ring.r2{inset:22px;}
+  .sonar .ring.r3{inset:44px;}
+  .anomaly{
+    position:absolute;width:14px;height:14px;border-radius:50%;background:var(--red);
+    box-shadow:0 0 10px var(--red);transform:translate(-50%,-50%);
   }
-  @keyframes sweep{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-  .sonar .dot{
-    position:absolute;width:10px;height:10px;border-radius:50%;background:var(--red);
-    top:38%;left:62%;box-shadow:0 0 10px var(--red);animation:dotpulse 1.4s ease-in-out infinite;
+  .cursor{
+    position:absolute;width:52px;height:52px;border-radius:50%;
+    border:2px solid var(--amber);background:rgba(255,176,32,0.12);
+    transform:translate(-50%,-50%);pointer-events:none;display:none;
+    transition:border-color .15s, background .15s, box-shadow .15s;
   }
-  @keyframes dotpulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.6);opacity:0.6;}}
-  .sonar-label{font-size:10.5px;letter-spacing:0.15em;color:var(--grey);text-transform:uppercase;text-align:center;margin-top:6px;}
+  .cursor.active{display:block;}
+  .cursor.locked{box-shadow:0 0 16px var(--amber);background:rgba(255,176,32,0.28);}
+  .sonar-label{font-size:10.5px;letter-spacing:0.1em;color:var(--grey);text-transform:uppercase;text-align:center;margin-top:4px;}
 
   /* briefing (final reveal) */
   #briefing{display:none;margin-top:6px;}
@@ -195,7 +212,7 @@
   .foot .sign{color:var(--amber);}
 
   @media (prefers-reduced-motion: reduce){
-    .scanlines,.flash.active,.sonar .sweep,.sonar .dot,.dest.glitch,.card.wrong{animation:none !important;}
+    .scanlines,.flash.active,.dest.glitch,.card.wrong{animation:none !important;}
   }
 </style>
 </head>
@@ -214,10 +231,21 @@
   </div>
 
   <div id="puzzles">
-    <!-- PRUEBA 1 -->
-    <div class="test" id="test1">
-      <div class="test-label">Prueba 1 · Geografía</div>
-      <div class="test-body">Nuestra zona de operaciones está en el único punto de la Europa continental desde el que, en un día despejado, se puede ver otro continente a simple vista. Selecciona su silueta.</div>
+    <!-- PRUEBA 1 — código de emergencia -->
+    <div class="test show" id="test1">
+      <div class="test-label">Prueba 1 · Código de emergencia</div>
+      <div class="test-body">Antes de seguir, revisad el equipo de señalización luminosa autónoma que lleváis para casos de emergencia en carretera. Dentro de su funda encontraréis un código de acceso.</div>
+      <div class="row">
+        <input type="text" id="answer1" placeholder="Código de acceso" autocomplete="off" autocapitalize="off" autocorrect="off">
+        <button id="check1">Comprobar</button>
+      </div>
+      <div class="feedback" id="feedback1"></div>
+    </div>
+
+    <!-- PRUEBA 2 — continentes -->
+    <div class="test show" id="test2">
+      <div class="test-label">Prueba 2 · Geografía</div>
+      <div class="test-body">Nuestra zona de operaciones está en el único punto de la Europa continental desde el que, en un día despejado, se puede ver otro continente a simple vista. Selecciona la silueta de este continente.</div>
       <div class="cards" id="cards">
         <button class="card" data-answer="correct">
           <img src="data:image/png;base64,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" alt="">
@@ -229,31 +257,49 @@
           <img src="data:image/png;base64,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" alt="">
         </button>
       </div>
-      <div class="feedback" id="feedback1"></div>
+      <div class="feedback" id="feedback2"></div>
     </div>
 
-    <!-- PRUEBA 2 -->
-    <div class="test" id="test2">
-      <div class="test-label">Prueba 2 · Donde dos mares se encuentran</div>
-      <div class="test-body">Hay un rincón donde dos mares muy distintos se dan la mano: uno abierto y embravecido, el otro más cerrado y templado. Arrastra el marcador hasta encontrar el punto exacto donde ambos se tocan.</div>
-      <div class="sea-readout" id="seaReadout">Estás en mar abierto.</div>
-      <input type="range" id="seaSlider" min="0" max="100" step="1" value="0">
-      <div class="scale-labels"><span>Atlántico</span><span>Mediterráneo</span></div>
-      <div class="feedback hint" id="feedback2"></div>
-    </div>
-
-    <!-- PRUEBA 3 -->
-    <div class="test" id="test3">
-      <div class="test-label">Prueba 3 · Informe de inteligencia</div>
-      <div class="test-body">Nuestros satélites llevan días registrando actividad anómala. Analiza la señal.</div>
-      <div class="sonar" id="sonar">
-        <div class="ring"></div>
-        <div class="ring r2"></div>
-        <div class="ring r3"></div>
-        <div class="sweep"></div>
-        <div class="dot"></div>
+    <!-- PRUEBA 3 — adivinanza del viento -->
+    <div class="test show" id="test3">
+      <div class="test-label">Prueba 3 · Adivinanza</div>
+      <div class="test-body">No tiene cuerpo, pero empuja. No tiene voz, pero silba. Hace bailar las banderas y vuela sin tener alas. ¿Qué es?</div>
+      <div class="row">
+        <input type="text" id="answer3" placeholder="Escribe tu respuesta" autocomplete="off" autocapitalize="off" autocorrect="off">
+        <button id="check3">Comprobar</button>
       </div>
-      <div class="sonar-label">Toca la señal para analizarla</div>
+      <div class="feedback" id="feedback3"></div>
+    </div>
+
+    <!-- PRUEBA 4 — equipo de visualización acuática -->
+    <div class="test show" id="test4">
+      <div class="test-label">Prueba 4 · Equipo de visualización acuática</div>
+      <div class="test-body">Todo agente de campo lleva encima el suyo: el equipo de visualización acuática profesional. El tuyo está guardado en el bolsillo trasero del asiento del copiloto. Sácalo, equípate, y sube una foto para verificar el equipamiento.</div>
+      <label class="upload-btn" for="photoInput">📷 Subir foto</label>
+      <input type="file" id="photoInput" accept="image/*" capture="user" style="display:none;">
+      <div class="photo-preview" id="photoPreview"></div>
+      <div class="feedback" id="feedback4"></div>
+    </div>
+
+    <!-- PRUEBA 5 — sonar / inteligencia -->
+    <div class="test show" id="test5">
+      <div class="test-label">Prueba 5 · Informe de inteligencia</div>
+      <div class="test-body">Nuestros satélites llevan días registrando actividad anómala. Analiza la señal.</div>
+      <div class="sonar-wrap">
+        <svg class="sonar-progress" viewBox="0 0 200 200">
+          <circle class="progress-bg" cx="100" cy="100" r="92"/>
+          <circle class="progress-fg" id="progressRing" cx="100" cy="100" r="92"/>
+        </svg>
+        <div class="sonar" id="sonar">
+          <div class="ring"></div>
+          <div class="ring r2"></div>
+          <div class="ring r3"></div>
+          <div class="anomaly" id="anomaly"></div>
+          <div class="cursor" id="cursor"></div>
+        </div>
+      </div>
+      <div class="sonar-label" id="sonarLabel">Mantén el marcador sobre la señal roja unos segundos, sin perderla.</div>
+      <div class="feedback" id="feedback5"></div>
     </div>
   </div>
 
@@ -275,6 +321,7 @@
       <div class="brief-label">Logística</div>
       <div class="brief-body" id="bodyLogistica"></div>
       <div class="callout" id="calloutLogistica"></div>
+      <div class="brief-body" id="bodyLogisticaAfter" style="margin-top:12px;"></div>
     </div>
 
     <div class="closing-note" id="closingNote"></div>
@@ -296,12 +343,9 @@
           </defs>
           <rect width="400" height="230" fill="url(#seaGrad)"/>
           <rect width="400" height="230" fill="url(#grid)"/>
-          <!-- masa continental (norte) -->
           <path d="M0,0 L400,0 L400,70 L360,78 L330,70 L300,80 L270,72 L240,84 L210,78 L190,90 L170,82 L150,92 L120,86 L90,94 L60,86 L30,92 L0,84 Z" fill="#0b0d0f" stroke="rgba(255,255,255,0.08)"/>
-          <!-- isla / istmo -->
           <path d="M175,92 C182,100 184,112 180,120 C195,118 214,120 222,132 C230,146 222,162 204,166 C188,170 170,164 162,150 C154,140 156,124 166,112 C168,104 170,96 175,92 Z" fill="#0b0d0f" stroke="rgba(255,255,255,0.1)"/>
           <path d="M178,118 L184,122" stroke="#0b0d0f" stroke-width="6"/>
-          <!-- marcador pulsante -->
           <circle cx="192" cy="140" r="10" fill="rgba(255,43,61,0.25)">
             <animate attributeName="r" values="8;16;8" dur="1.6s" repeatCount="indefinite"/>
             <animate attributeName="opacity" values="0.5;0.05;0.5" dur="1.6s" repeatCount="indefinite"/>
@@ -322,6 +366,9 @@
 
 <script>
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function norm(s){
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
 
 async function typeInto(container, lines){
   container.classList.add('show');
@@ -345,6 +392,8 @@ const intro = document.getElementById('intro');
 const test1 = document.getElementById('test1');
 const test2 = document.getElementById('test2');
 const test3 = document.getElementById('test3');
+const test4 = document.getElementById('test4');
+const test5 = document.getElementById('test5');
 const puzzles = document.getElementById('puzzles');
 const briefing = document.getElementById('briefing');
 const mapBlock = document.getElementById('mapBlock');
@@ -361,84 +410,243 @@ async function boot(){
 }
 boot();
 
-// PRUEBA 1 — continentes
-let wrong1 = 0;
-const cards = document.querySelectorAll('#cards .card');
+// PRUEBA 1 — código de emergencia
+let wrongCode = 0;
+const answer1 = document.getElementById('answer1');
 const feedback1 = document.getElementById('feedback1');
+document.getElementById('check1').addEventListener('click', async () => {
+  const val = norm(answer1.value);
+  if(val === 'emergencia' || val.includes('emergencia')){
+    feedback1.className = 'feedback ok';
+    feedback1.textContent = 'Código validado. Continuamos.';
+    answer1.disabled = true;
+    document.getElementById('check1').disabled = true;
+    await sleep(700);
+    test2.classList.add('show');
+  } else {
+    wrongCode++;
+    if(wrongCode >= 2){
+      feedback1.className = 'feedback hint';
+      feedback1.textContent = 'El código era "emergencia". Continuamos.';
+      answer1.disabled = true;
+      document.getElementById('check1').disabled = true;
+      await sleep(900);
+      test2.classList.add('show');
+    } else {
+      feedback1.className = 'feedback hint';
+      feedback1.textContent = 'No es ese. Revisad de nuevo la funda de vuestro equipo de emergencia.';
+    }
+  }
+});
+
+// PRUEBA 2 — continentes
+let wrong2 = 0;
+const cards = document.querySelectorAll('#cards .card');
+const feedback2 = document.getElementById('feedback2');
 cards.forEach(card => {
   card.addEventListener('click', async () => {
     if(card.disabled) return;
     if(card.dataset.answer === 'correct'){
       cards.forEach(c => c.disabled = true);
       card.classList.add('correct');
-      feedback1.className = 'feedback ok';
-      feedback1.textContent = 'Correcto. Estáis más cerca de lo que creéis del continente vecino.';
+      feedback2.className = 'feedback ok';
+      feedback2.textContent = 'Correcto. Estáis más cerca de lo que creéis del continente vecino.';
       await sleep(700);
-      test2.classList.add('show');
+      test3.classList.add('show');
     } else {
-      wrong1++;
+      wrong2++;
       card.classList.add('wrong');
       await sleep(400);
       card.classList.remove('wrong');
-      if(wrong1 >= 2){
+      if(wrong2 >= 2){
         cards.forEach(c => { c.disabled = true; if(c.dataset.answer === 'correct') c.classList.add('correct'); });
-        feedback1.className = 'feedback hint';
-        feedback1.textContent = 'Era esa. Seguimos.';
+        feedback2.className = 'feedback hint';
+        feedback2.textContent = 'Era esa. Seguimos.';
         await sleep(800);
-        test2.classList.add('show');
+        test3.classList.add('show');
       } else {
-        feedback1.className = 'feedback hint';
-        feedback1.textContent = 'No es esa. Pensad en lo que hay al otro lado del mar, muy cerca.';
+        feedback2.className = 'feedback hint';
+        feedback2.textContent = 'No es esa. Pensad en lo que hay al otro lado del mar, muy cerca.';
       }
     }
   });
 });
 
-// PRUEBA 2 — punto de encuentro de los mares
-const seaSlider = document.getElementById('seaSlider');
-const seaReadout = document.getElementById('seaReadout');
-const feedback2 = document.getElementById('feedback2');
-let wrong2 = 0;
-let solved2 = false;
-
-seaSlider.addEventListener('input', () => {
-  const v = parseInt(seaSlider.value, 10);
-  if(v < 40) seaReadout.textContent = 'Estás en mar abierto: el Atlántico.';
-  else if(v > 60) seaReadout.textContent = 'Aguas más templadas: ya es el Mediterráneo.';
-  else seaReadout.textContent = 'Las corrientes se mezclan aquí...';
-});
-
-seaSlider.addEventListener('change', async () => {
-  if(solved2) return;
-  const v = parseInt(seaSlider.value, 10);
-  if(v >= 45 && v <= 55){
-    solved2 = true;
-    seaSlider.disabled = true;
-    feedback2.className = 'feedback ok';
-    feedback2.textContent = 'Ahí es. El punto exacto donde ambos mares se abrazan.';
+// PRUEBA 3 — adivinanza del viento
+let wrong3 = 0;
+const answer3 = document.getElementById('answer3');
+const feedback3 = document.getElementById('feedback3');
+document.getElementById('check3').addEventListener('click', async () => {
+  const val = norm(answer3.value);
+  if(val === 'viento' || val.includes('viento')){
+    feedback3.className = 'feedback ok';
+    feedback3.textContent = 'Exacto. Aquí sopla con ganas.';
+    answer3.disabled = true;
+    document.getElementById('check3').disabled = true;
     await sleep(700);
-    test3.classList.add('show');
+    test4.classList.add('show');
   } else {
-    wrong2++;
-    if(wrong2 >= 5){
-      solved2 = true;
-      seaSlider.disabled = true;
-      feedback2.className = 'feedback hint';
-      feedback2.textContent = 'Lo suficientemente cerca. Seguimos.';
-      await sleep(700);
-      test3.classList.add('show');
+    wrong3++;
+    if(wrong3 >= 2){
+      feedback3.className = 'feedback hint';
+      feedback3.textContent = 'Era "viento". Seguimos.';
+      answer3.disabled = true;
+      document.getElementById('check3').disabled = true;
+      await sleep(900);
+      test4.classList.add('show');
     } else {
-      feedback2.className = 'feedback hint';
-      feedback2.textContent = v < 45 ? 'Todavía Atlántico puro. Sigue avanzando.' : 'Te has adentrado ya en el Mediterráneo. Retrocede un poco.';
+      feedback3.className = 'feedback hint';
+      feedback3.textContent = 'No es eso. Pensad en lo que mueve las velas y despeina el pelo.';
     }
   }
 });
 
-// PRUEBA 3 — sonar
-let analyzed = false;
-document.getElementById('sonar').addEventListener('click', async () => {
-  if(analyzed) return;
-  analyzed = true;
+// PRUEBA 4 — equipo de visualización acuática (foto)
+const photoInput = document.getElementById('photoInput');
+const photoPreview = document.getElementById('photoPreview');
+const feedback4 = document.getElementById('feedback4');
+photoInput.addEventListener('change', async () => {
+  const file = photoInput.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    photoPreview.classList.add('show');
+    photoPreview.innerHTML = '<div class="photo-frame" id="photoFrame"><img src="'+e.target.result+'" alt=""><div class="scan"></div></div>';
+    feedback4.className = 'feedback hint';
+    feedback4.textContent = 'Recibiendo imagen...';
+    await sleep(1000);
+    feedback4.textContent = 'Verificando equipamiento...';
+    await sleep(1400);
+    document.getElementById('photoFrame').classList.add('done');
+    feedback4.className = 'feedback ok';
+    feedback4.textContent = 'Equipo confirmado. Agente lista para inmersión.';
+    await sleep(700);
+    test5.classList.add('show');
+  };
+  reader.readAsDataURL(file);
+});
+
+// PRUEBA 5 — sonar: seguimiento sostenido
+const sonarEl = document.getElementById('sonar');
+const anomalyEl = document.getElementById('anomaly');
+const cursorEl = document.getElementById('cursor');
+const progressRing = document.getElementById('progressRing');
+const feedback5 = document.getElementById('feedback5');
+const sonarLabel = document.getElementById('sonarLabel');
+
+let sCenterX = 0, sCenterY = 0, sMaxR = 0;
+let sCurX = 0, sCurY = 0, sTargetX = 0, sTargetY = 0;
+function pickNewTarget(){
+  const ang = Math.random() * Math.PI * 2;
+  const r = Math.sqrt(Math.random()) * sMaxR;
+  sTargetX = sCenterX + r * Math.cos(ang);
+  sTargetY = sCenterY + r * Math.sin(ang);
+}
+function updateSonarGeometry(){
+  const rect = sonarEl.getBoundingClientRect();
+  sCenterX = rect.width / 2;
+  sCenterY = rect.height / 2;
+  sMaxR = rect.width * 0.4;
+  if(sCurX === 0 && sCurY === 0){
+    sCurX = sCenterX;
+    sCurY = sCenterY;
+  }
+  pickNewTarget();
+}
+updateSonarGeometry();
+window.addEventListener('resize', updateSonarGeometry);
+
+let sLastTime = performance.now();
+let sPointerActive = false;
+let sPointerX = null, sPointerY = null;
+let sLockMs = 0;
+const S_REQUIRED_MS = 2600;
+const S_LOCK_RADIUS = 26;
+const S_CIRC = 2 * Math.PI * 92;
+let sCompleted = false;
+
+function sSetCursor(x, y){
+  cursorEl.style.left = x + 'px';
+  cursorEl.style.top = y + 'px';
+}
+function sUpdateFromEvent(e){
+  const rect = sonarEl.getBoundingClientRect();
+  sPointerX = e.clientX - rect.left;
+  sPointerY = e.clientY - rect.top;
+  sSetCursor(sPointerX, sPointerY);
+}
+sonarEl.addEventListener('pointerdown', (e) => {
+  if(sCompleted) return;
+  sPointerActive = true;
+  cursorEl.classList.add('active');
+  try{ sonarEl.setPointerCapture(e.pointerId); }catch(err){}
+  sUpdateFromEvent(e);
+});
+sonarEl.addEventListener('pointermove', (e) => {
+  if(!sPointerActive) return;
+  sUpdateFromEvent(e);
+});
+function sEndPointer(){
+  sPointerActive = false;
+  cursorEl.classList.remove('active');
+  cursorEl.classList.remove('locked');
+}
+sonarEl.addEventListener('pointerup', sEndPointer);
+sonarEl.addEventListener('pointercancel', sEndPointer);
+
+function sUpdateRing(frac){
+  progressRing.style.strokeDashoffset = String(S_CIRC * (1 - frac));
+}
+
+function sLoop(now){
+  if(sCompleted) return;
+  const dt = now - sLastTime;
+  sLastTime = now;
+
+  const speed = 0.052; // px por ms, velocidad del vagabundeo
+  const dx0 = sTargetX - sCurX, dy0 = sTargetY - sCurY;
+  const distToTarget = Math.sqrt(dx0*dx0 + dy0*dy0);
+  if(distToTarget < 4){
+    pickNewTarget();
+  } else {
+    sCurX += (dx0 / distToTarget) * speed * dt;
+    sCurY += (dy0 / distToTarget) * speed * dt;
+  }
+  const ax = sCurX, ay = sCurY;
+  anomalyEl.style.left = ax + 'px';
+  anomalyEl.style.top = ay + 'px';
+
+  if(sPointerActive && sPointerX !== null){
+    const dx = sPointerX - ax, dy = sPointerY - ay;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if(dist <= S_LOCK_RADIUS){
+      sLockMs = Math.min(S_REQUIRED_MS, sLockMs + dt);
+      cursorEl.classList.add('locked');
+    } else {
+      sLockMs = Math.max(0, sLockMs - dt * 1.4);
+      cursorEl.classList.remove('locked');
+    }
+  } else {
+    sLockMs = Math.max(0, sLockMs - dt * 1.0);
+  }
+
+  sUpdateRing(sLockMs / S_REQUIRED_MS);
+
+  if(sLockMs >= S_REQUIRED_MS){
+    sCompleted = true;
+    sOnLocked();
+    return;
+  }
+  requestAnimationFrame(sLoop);
+}
+requestAnimationFrame(sLoop);
+
+async function sOnLocked(){
+  feedback5.className = 'feedback ok';
+  feedback5.textContent = 'Señal bloqueada.';
+  sonarLabel.textContent = '';
+
   const flash = document.getElementById('flash');
   flash.classList.add('active');
   await sleep(1900);
@@ -484,7 +692,12 @@ document.getElementById('sonar').addEventListener('click', async () => {
   await sleep(200);
   calloutLogistica.classList.add('show');
   await typeInto(calloutLogistica, [
-    'La Agencia cubre el alojamiento durante todo el despliegue. Las inmersiones, sin embargo, no entran en el presupuesto de esta fase: cada agente deberá asumir el coste de las suyas.'
+    'La Agencia cubre el alojamiento durante todo el despliegue. Las inmersiones, sin embargo, no entran en el presupuesto de esta fase: cada agente deberá asumir el coste de las suyas. La Agencia no es una ONG.'
+  ]);
+
+  await sleep(400);
+  await typeInto(document.getElementById('bodyLogisticaAfter'), [
+    'El presupuesto es limitado en esta ocasión porque las misiones venideras lo requieren así.'
   ]);
 
   await sleep(500);
@@ -496,7 +709,7 @@ document.getElementById('sonar').addEventListener('click', async () => {
   mapBlock.classList.add('show');
   await sleep(300);
   await typeInto(foot, ['-- AGENCIA X CENTRAL --']);
-});
+}
 </script>
 
 </body>
